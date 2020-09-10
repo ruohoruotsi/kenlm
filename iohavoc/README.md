@@ -19,7 +19,7 @@
 
  
 ### Use LM to predict perplexity of individual sentences
- * Use custom `score_vtt` file to process a VTT file and emit a score &rarr; `python score_vtt.py`
+ * Use custom `score_vtt.py` file to process a VTT file and emit a score &rarr; `python score_vtt.py [a-vtt-file]`
  
  
 ### Use FastText to predict the language class of individual sentences
@@ -27,7 +27,11 @@
 
  * Download pretrained model &rarr; `wget -O /tmp/lid.176.bin https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin`
 
- * 
-
+ * Use `score_fasttext.py` with a text-string
+ 	
+ 	```
+ 	iroro:iohavoc_1}$ python score_fasttext.py "J'ai au fond de ma mémoire des lumières d'autrefois"
+	([['__label__fr']], [array([0.99864495], dtype=float32)])
+	```
 
  
