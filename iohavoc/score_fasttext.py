@@ -2,7 +2,7 @@ import sys
 import fasttext
 
 
-PRETRAINED_MODEL_PATH = '/tmp/lid.176.bin'
+PRETRAINED_MODEL_PATH = './lid.176.bin'
 
 if __name__ == '__main__':
 

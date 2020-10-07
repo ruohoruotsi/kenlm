@@ -54,7 +54,9 @@ if __name__ == '__main__':
 
     subtitles = parse_vtt(vtt)
     for sub in subtitles:    
-        print(str(model.perplexity(sub)) + "\t" + sub )
+        # print(str(model.perplexity(sub)) + "\t" + "\t" + sub )
+        # print("{:.2f}".format(model.perplexity(sub)) + "\t" + "\t" + sub )
+        print(sub + "\t" + "\t" + "{:.2f}".format(model.perplexity(sub)))
         # print(model.score(sub, bos=True, eos=True), model.perplexity(sub))
 
     print("\n\n")
