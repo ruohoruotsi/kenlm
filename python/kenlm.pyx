@@ -85,6 +85,11 @@ class LoadMethod:
     READ = _kenlm.READ
     PARALLEL_READ = _kenlm.PARALLEL_READ
 
+class ARPALoadComplain:
+    ALL = _kenlm.ALL
+    EXPENSIVE = _kenlm.EXPENSIVE
+    NONE = _kenlm.NONE
+
 cdef class Config:
     """
     Wrapper around lm::ngram::Config.
@@ -106,6 +111,12 @@ cdef class Config:
             return self._c_config.show_progress
         def __set__(self, to):
             self._c_config.show_progress = to
+
+    property arpa_complain:
+        def __get__(self):
+            return self._c_config.arpa_complain
+        def __set__(self, to):
+            self._c_config.arpa_complain = to
 
 cdef class Model:
     """
@@ -205,7 +216,7 @@ cdef class Model:
     
     def full_scores(self, sentence, bos = True, eos = True):
         """
-        full_scores(sentence, bos = True, eos = Ture) -> generate full scores (prob, ngram length, oov)
+        full_scores(sentence, bos = True, eos = True) -> generate full scores (prob, ngram length, oov)
         @param sentence is a string (do not use boundary symbols)
         @param bos should kenlm add a bos state
         @param eos should kenlm add an eos state
@@ -253,7 +264,7 @@ cdef class Model:
     
     def BaseFullScore(self, State in_state, str word, State out_state):
         """
-        Wrapper around model.BaseScore(in_state, Index(word), out_state)
+        Wrapper around model.BaseFullScore(in_state, Index(word), out_state)
 
         :param word: the suffix
         :param state: the context (defaults to NullContext)

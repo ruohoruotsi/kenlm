@@ -1,9 +1,26 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
+
+if (WIN32)
+    set(Boost_USE_STATIC_LIBS OFF)
+    # The auto-linking feature has problems with USE_STATIC_LIBS off, so we use
+    # BOOST_ALL_NO_LIB to turn it off.
+    # Several boost libraries headers aren't configured correctly if
+    # USE_STATIC_LIBS is off, so we explicitly say they are dynamic with the
+    # remaining definitions.
+    add_definitions(-DBOOST_ALL_NO_LIB -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_IOSTREAMS_DYN_LINK -DBOOST_THREAD_DYN_LINK)
+endif( )
 
 # Define a single cmake project
 project(kenlm)
 
 option(FORCE_STATIC "Build static executables" OFF)
+option(COMPILE_TESTS "Compile tests" OFF)
+option(ENABLE_PYTHON "Build Python bindings" OFF)
+# Eigen3 less than 3.1.0 has a race condition: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=466
+find_package(Eigen3 3.1.0 CONFIG)
+include(CMakeDependentOption)
+cmake_dependent_option(ENABLE_INTERPOLATE "Build interpolation program (depends on Eigen3)" ON "EIGEN3_FOUND AND NOT WIN32" OFF)
+
 if (FORCE_STATIC)
   #presumably overkill, is there a better way?
   #http://cmake.3232098.n2.nabble.com/Howto-compile-static-executable-td5580269.html
@@ -47,7 +64,6 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-option(COMPILE_TESTS "Compile tests" OFF)
 if (COMPILE_TESTS)
   # Tell cmake that we want unit tests to be compiled
   include(CTest)
@@ -79,11 +95,18 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # Process subdirectories
 add_subdirectory(util)
 add_subdirectory(lm)
 
-option (ENABLE_PYTHON "python bindings" OFF)
+foreach(SUBDIR IN ITEMS util util/double-conversion util/stream lm lm/builder lm/common lm/filter lm/interpolate)
+  file(GLOB HEADERS ${CMAKE_CURRENT_LIST_DIR}/${SUBDIR}/*.h ${CMAKE_CURRENT_LIST_DIR}/${SUBDIR}/*.hh)
+  install(FILES ${HEADERS} DESTINATION include/kenlm/${SUBDIR})
+endforeach(SUBDIR)
+
 if(ENABLE_PYTHON)
   add_subdirectory(python)
 endif()
